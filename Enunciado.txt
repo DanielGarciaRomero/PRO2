@@ -1,0 +1,241 @@
+                        GESTIÓN DE REVISTAS CIENTÍFICAS 
+
+Las bibliotecas universitarias almacenan revistas científicas que están
+clasificadas por áreas temáticas, por ejemplo Informática, Física, Química,
+etc.  y también por su calidad, que se expresa mediante un índice de 1 a N.
+Queremos que desarrolléis una aplicación para gestionar las revistas de una
+biblioteca, incluyendo funcionalidades como añadir, eliminar o fusionar
+revistas, o listar las revistas de una cierta calidad.
+
+Una revista se puede clasificar en diferentes áreas en función del grado de
+precisión deseado (es decir, la mayor o menor relación entre el área y los
+contenidos de la revista).  Una posible clasificación podría realizarse a
+partir del área "General", que es la forma menos precisa de clasificar una
+revista.  Éste área se subdivide en dos, "Ciencias" y "Letras", y así
+sucesivamente, dando lugar a un esquema como el que mostramos a continuación
+
+                                                            / lentes 
+                                                     Óptica  
+                                                    /       \ láser
+                                                Física            
+                                               /    \            / circuitos
+                                              /      Electrónica 
+                               C. Experimentales                 \ láser
+                              /               \
+                             /                 \
+                            /                   Química ...
+                           /  
+                  C. Básicas 
+                  /        \                          An./Topol. ...
+                 /          \                        /  
+                /            \              Matemáticas            
+               /              \            /         \        
+              /                \          /           Alg./Geom. ...
+             /                C. Matemáticas 
+            /                             \ 
+           /                               \ 
+       Ciencias                           Prob./Estad. ...  
+        /  \           
+       /    \
+      /      Ingeniería ...
+     /
+General
+     \
+      \       Polit./Soc. ... 
+       \     /
+        Letras                
+             \ 
+              Fil. y Letras ...
+
+
+Una publicación llamada "Revista_de_Óptica" podría clasificarse dentro de
+"Óptica" pero también de "Física", "C. Experimentales", etc, es decir,
+cualquier área conectada desde Óptica hasta "General", dependiendo de la
+variedad de sus contenidos.
+
+Consideramos que clasificar una revista consiste en asignarle una única área
+que caracterice sus contenidos bajo un criterio objetivo. A este área
+característica de una revista la denominaremos "área temática de la revista".
+Definir un buen criterio es complejo y por ello emplearemos dos criterios
+diferentes como veremos más adelante.
+
+Una revista tiene asociadas una o varias palabras clave que resumen sus
+contenidos.  A su vez, las palabras clave pueden estar asociadas a diferentes
+áreas del esquema de clasificación. Para simplificar, supondremos que todas
+las posibles palabras clave de todas las revistas son un subconjunto de las
+áreas temáticas de la clasificación que no se subdividen en subáreas.
+
+Supongamos por ejemplo que la palabra clave "láser" solo está asociada a
+"Óptica" y a "Electrónica". Supongamos también que "láser" és la única palabra
+clave de "Revista_de_Óptica".  Entonces para clasificar dicha revista debemos
+asignarle un área temática entre las diferentes áreas del esquema mostrado más
+arriba. En concreto, deseamos que sea la asignación más precisa posible en
+relación a la palabra clave "láser" (cuanto más distante del área "General"
+sea el área asignada, mayor precisión).
+
+Como hemos dicho, emplearemos dos criterios diferentes para clasificar las
+revistas, de forma que cada revista tendrá asignadas dos áreas temáticas (una
+para cada criterio, aunque podrían ser la misma). El primer criterio (criterio
+1) consiste en determinar el área temática que cubra las palabras claves con
+la mayor precisión posible. En nuestro ejemplo la cuestión es sencilla, ya que
+al tratarse de una sola palabra clave, el área más precisa coincide con dicha
+palabra clave ("láser").  El segundo criterio (criterio 2) consiste en escoger
+el área temática más precisa que cubra *todas* las áreas asociadas con dicha
+palabra clave. En nuestro ejemplo el área que resulta es "Física".
+
+Notad que en ambos criterios, "C. Básicas" y "C. Experimentales" quedan
+descartadas por ser menos precisas que las áreas asignadas, mientras que
+"C. Matemáticas" o "Fil. y Letras" son inapropiadas al no estar ni ellas ni
+sus subclasificaciones asociadas a la palabra clave "láser". A continuación
+definimos con mayor detalle ambos criterios.
+
+Criterios de clasificación:
+===========================
+
+Consideremos la siguiente clasificación de áreas temáticas
+
+                                     a 
+                                  /     \
+                                 c        b
+                               /    \    / \
+                              e      f  g   t
+                             / \    / \      \
+                            k   i   w  g      h
+                           / \     / \
+                          h   p   l   m
+
+Definimos las palabras clave "cubiertas" por una área como
+
+- ella misma si no tiene subáreas o 
+
+- la unión de las palabras clave de sus subáreas (incluye el caso de que tenga
+  solo un subárea)
+
+En el ejemplo anterior, la palabra o palabras clave cubiertas por
+
+- "a" son {g, h, i, l, m, p}
+- "b" son {g, h}
+- "c" son {g, h, i, l, m, p}
+- "g" es únicamente {g}
+
+Definimos el área asociada a una revista por el criterio 1 como el área más
+precisa (más alejada de "a" en el ejemplo anterior) cuyas palabras cubiertas
+incluyan al menos *una* aparición de todas las palabras clave de la revista.
+En caso de que más de una área de la misma profundidad cumpla esta propiedad
+escogeremos la menor en orden alfabético como clasificación definitiva.  En el
+ejemplo anterior, si una revista tiene como palabras clave
+
+- {g} entonces su área temática es "g" 
+
+- {g, l} entonces su área temática es "f"
+
+- {g, h} entonces su área temática es "b" (no es "c", por el desempate)
+
+- {h, i} entonces su área temática es "e"
+
+- {i, m, p} entonces su área temática es "c"
+
+Definimos el área asociada a una revista por el criterio 2 como el área más
+precisa (más alejada de "a" en el ejemplo anterior) cuya palabras cubiertas
+incluyan a *todas* las apariciones de todas las palabras clave de la revista.
+En este criterio no existe la posibilidad de empates.
+
+En el ejemplo anterior, si una revista tiene como palabra clave
+
+- {i} entonces su área temática es "i" 
+
+- {g} entonces su área temática es "a"
+
+- {h, i} entonces su área temática es "a"
+
+- {l, m} entonces su área temática es "w"
+
+- {l, m, p} entonces su área temática es "c"
+
+
+Dicha aplicación debe almacenar información sobre el esquema de clasificación
+en áreas, que es fijo (pero independiente de la bilioteca) y contiene al menos
+un área.
+
+A continuación presentamos todas las funcionalidades del programa. La
+aplicación debe permitir gestionar altas y bajas de revistas, fusionar
+revistas y listar las revistas con un determinado índice de calidad.
+
+
+SE PIDE
+=======
+
+Diseñar un programa modular razonablemente eficiente para la aplicación de
+gestión de revistas descrita.
+
+En primer lugar, debe leer el N, el valor máximo del índice de calidad de las
+revistas, que será un entero mayor que 0.
+
+Seguidamente leerá el esquema de clasificación de revistas, que incluye las
+relaciones jerárquicas entre áreas. Dicho esquema contendrá al menos una área
+y es independiente de la biblioteca (diferentes bibliotecas podrían usar un
+mismo esquema).
+
+Después tendrá que ir procesando las diversas tareas que se le pidan. Éstas
+podrán ser las siguientes:
+
+1) Alta de revista. Se proporciona el nombre, la secuencia de palabras clave y
+el índice de calidad de la revista, que es una puntuación de 1 a N. La revista
+no ha de estar previamente en el sistema.
+
+El efecto de esta operación es el almacenamiento de dicha información en la
+aplicación y también la asignación dos áreas temáticas a la revista, una para
+cada uno de los dos métodos de clasificación explicados más arriba. 
+
+2) Baja de revista. Solo se proporciona su nombre de la revista y ésta ha de
+estar en el sistema. Esta operación tiene como consecuencia que toda
+información relativa a la revista se elimina del sistema.
+
+3) Fusión de revistas.  Se proporcionan los nombres de las dos revistas a
+fusionar, por ejemplo R1 y R2, que han de ser distintas y pertenecer al
+sistema.  La fusión implica lo siguiente:
+
+- R1 conserva su nombre, su índice de calidad y sus palabras clave. Además, las
+  palabras clave de R2 pasan a serlo también de R1
+
+- Se asignan a R1 dos nuevas áreas temáticas, una para cada criterio, ya que
+  sus palabras clave han podido cambiar según el punto anterior
+
+- R2 desaparece del sistema
+
+
+4) Listado de revistas. Se proporcionará un índice de calidad (un entero entre
+1 y N) y un criterio de clasificación (1 o 2).  Se han de listar todas las
+revistas con dicho índice de calidad. En el listado, las revistas se han de
+agrupar por el área temática obtenida según el criterio especificado. En el
+listado deben aparecer los nombres de las áreas temáticas y los de las
+revistas.  El orden es alfabético por área temática y, dentro de cada área,
+por nombre de la revista.
+
+5) Consultar revista. Se proporciona el nombre de una revista, que puede estar
+en el sistema o no. Se ha de escribir toda la información de la revista: si
+existe o no, y en su caso, su índice de calidad, sus palabras clave (en orden
+alfabético) y sus áreas (criterio 1 y criterio 2, por este orden).
+
+Supondremos que los nombres de revista y área (lo cual incluye las palabras
+clave) están formados por una sola palabra (excluyendo así series de palabras
+separadas por espacios en blanco como "Genómica Funcional"; se admite en
+cambio "Genómica_Funcional"). Supondremos también que los caracteres válidos
+para formar parte de dichos nombres y la longitud máxima de éstos son los
+mismos que los de la clase string de C++. No puede suponerse un número máximo
+determinado de revistas o de áreas (lo cual incluye las palabras clave).
+
+La forma de comunicarnos con el programa para que realice dichas tareas será
+parecida a la del caso de estudio "Cubeta" que aparece en la sesión 8 de
+laboratorio. Podéis diseñar un esquema provisional que ya refinaréis cuando
+conozcáis el juego de pruebas público.
+
+En días sucesivos se completarán los detalles que se hayan podido pasar por
+alto en este enunciado y se publicarán las aclaraciones oportunas.
+
+La sintaxis *exacta* de los datos y resultados, acompañada del juego de pruebas
+público, se conocerá tres semanas antes del día de entrega de la práctica.
+Hasta entonces no podréis implementar de forma definitiva las operaciones de
+lectura y escritura necesarias para los tipos que utilicéis, aunque sí podréis
+especificarlas.
+
